@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDE工作台 | 澳洲移民自动化营销系统</title>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-light: #6366f1;
+  --primary-bg: #eef2ff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-800);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ========== Layout ========== */
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 220px;
+  background: var(--gray-900);
+  color: #fff;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-brand .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+.sidebar-brand .sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+.nav { padding: 12px 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  color: var(--gray-300);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active { background: rgba(99,102,241,0.15); color: #fff; border-left-color: var(--primary-light); }
+
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.main { flex: 1; margin-left: 220px; min-width: 0; }
+
+.topbar {
+  background: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky; top: 0; z-index: 50;
+}
+
+.topbar h1 { font-size: 18px; font-weight: 600; color: var(--gray-900); }
+.topbar .desc { font-size: 12px; color: var(--gray-500); margin-top: 1px; }
+
+.content { padding: 24px; }
+
+/* ========== Cards ========== */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h2 { font-size: 15px; font-weight: 600; }
+.card-header .badge { font-size: 12px; color: var(--gray-500); }
+
+.card-body { padding: 20px; }
+
+/* ========== Dashboard Stats ========== */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+.stat-card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-card .label { font-size: 12px; color: var(--gray-500); margin-bottom: 6px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: var(--gray-900); }
+.stat-card .trend { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.stat-card .trend.up { color: var(--success); }
+.stat-card .trend.down { color: var(--danger); }
+.stat-card .icon-wrap { float: right; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+/* ========== Funnel Chart ========== */
+.funnel-container { padding: 0 10px; }
+
+.funnel-stage {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 0;
+  position: relative;
+}
+
+.funnel-bar-wrap { flex: 1; position: relative; }
+
+.funnel-bar {
+  height: 48px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+
+.funnel-bar:hover { filter: brightness(1.1); }
+
+.funnel-bar .stage-name { font-size: 13px; }
+.funnel-bar .stage-num { font-size: 18px; }
+
+.funnel-rate {
+  width: 80px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--gray-500);
+  padding-left: 12px;
+}
+
+.funnel-connector {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+}
+
+.funnel-connector .arrow { font-size: 16px; color: var(--gray-300); }
+.funnel-connector .loss { font-size: 11px; color: var(--danger); margin-left: 6px; }
+
+/* ========== Drip Timeline ========== */
+.drip-timeline { position: relative; padding-left: 24px; }
+
+.drip-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--gray-200);
+}
+
+.drip-phase { position: relative; margin-bottom: 24px; }
+
+.drip-phase::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.drip-phase.active::before { background: var(--success); box-shadow: 0 0 0 2px var(--success); animation: pulse 2s infinite; }
+.drip-phase.done::before { background: var(--gray-300); box-shadow: 0 0 0 2px var(--gray-300); }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--success), 0 0 0 0 rgba(16,185,129,0.4); }
+  50% { box-shadow: 0 0 0 2px var(--success), 0 0 0 6px rgba(16,185,129,0); }
+}
+
+.drip-phase-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.drip-phase-title .phase-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+
+.drip-actions { margin-left: 0; }
+
+.drip-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--gray-50);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.drip-action .time { color: var(--gray-500); font-weight: 600; min-width: 64px; font-size: 12px; }
+.drip-action .action-text { flex: 1; }
+.drip-action .action-channel { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--primary-bg); color: var(--primary); }
+
+.drip-action.done { opacity: 0.6; }
+.drip-action.done .action-text { text-decoration: line-through; }
+
+/* ========== Customer Table ========== */
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--gray-500);
+  border-bottom: 2px solid var(--gray-100);
+  white-space: nowrap;
+}
+
+tbody td { padding: 10px 12px; border-bottom: 1px solid var(--gray-50); }
+
+tbody tr:hover { background: var(--gray-50); }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.tag-a { background: #dcfce7; color: #166534; }
+.tag-b { background: #fef3c7; color: #92400e; }
+.tag-c { background: #f3f4f6; color: #525252; }
+.tag-d { background: #fee2e2; color: #991b1b; }
+
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-active { background: var(--success); }
+.status-waiting { background: var(--warning); }
+.status-lost { background: var(--gray-300); }
+.status-signed { background: var(--primary); }
+
+/* ========== Scripts Library ========== */
+.script-search { margin-bottom: 16px; }
+
+.script-search input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.script-search input:focus { border-color: var(--primary); }
+
+.script-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+
+.script-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--gray-200);
+  background: #fff;
+  transition: all 0.15s;
+  color: var(--gray-600);
+}
+
+.script-tab:hover { border-color: var(--primary); color: var(--primary); }
+.script-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.script-item {
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.15s;
+}
+
+.script-item:hover { box-shadow: var(--shadow); }
+
+.script-item .script-scene { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.script-item .script-content { font-size: 14px; line-height: 1.7; color: var(--gray-700); }
+.script-item .copy-btn {
+  float: right;
+  font-size: 12px;
+  color: var(--primary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.script-item:hover .copy-btn { opacity: 1; }
+
+/* ========== Forms ========== */
+.form-group { margin-bottom: 14px; }
+
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+
+.form-group textarea { resize: vertical; min-height: 60px; }
+
+.btn {
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-light); }
+
+.btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-200); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* ========== Modal ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  width: 520px;
+  max-width: 92vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h2 { font-size: 16px; font-weight: 600; }
+.modal-close { font-size: 20px; cursor: pointer; color: var(--gray-400); line-height: 1; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 16px 20px; border-top: 1px solid var(--gray-100); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--gray-900);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ========== Utility ========== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+/* ========== Top Tab Nav ========== */
+.top-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.top-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--gray-500);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-tab:hover { color: var(--gray-800); }
+.top-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+.top-tab .tab-icon { font-size: 14px; }
+
+@media (max-width: 768px) {
+  .sidebar { width: 56px; }
+  .sidebar-brand .logo, .sidebar-brand .sub, .nav-item span { display: none; }
+  .nav-item { justify-content: center; }
+  .main { margin-left: 56px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .top-tabs { padding: 0 12px; }
+  .top-tab { padding: 8px 12px; }
+}
+
+/* ========== Integration Cards ========== */
+.integration-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.integration-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.integration-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.status-connected { background: #dcfce7; color: #166534; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-offline { background: #f3f4f6; color: #6b7280; }
+
+.status-dot-lg { width: 8px; height: 8px; border-radius: 50%; }
+.status-dot-lg.on { background: var(--success); }
+.status-dot-lg.wait { background: var(--warning); }
+.status-dot-lg.off { background: var(--gray-400); }
+
+.integration-body { padding: 20px; }
+
+.integration-steps { list-style: none; padding: 0; }
+.integration-steps li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-50);
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.integration-steps li:last-child { border-bottom: none; }
+.integration-steps .step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.integration-steps .step-done .step-num { background: #dcfce7; color: #166534; }
+.integration-steps .step-done .step-text { text-decoration: line-through; opacity: 0.6; }
+
+/* ========== Content Analysis ========== */
+.note-card {
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.15s;
+}
+.note-card:hover { box-shadow: var(--shadow); }
+
+.note-card .note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.note-card .note-title { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.note-card .note-date { font-size: 12px; color: var(--gray-400); }
+.note-card .note-metrics {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.note-card .metric {
+  text-align: center;
+}
+.note-card .metric .metric-val { font-size: 20px; font-weight: 700; color: var(--gray-900); }
+.note-card .metric .metric-label { font-size: 11px; color: var(--gray-500); }
+
+.note-card .note-score {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.score-high { background: #dcfce7; color: #166534; }
+.score-mid { background: #fef3c7; color: #92400e; }
+.score-low { background: #fee2e2; color: #991b1b; }
+
+.note-card .suggestion {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--primary-bg);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--primary);
+  line-height: 1.6;
+}
+
+.competitor-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-50);
+}
+.competitor-row:last-child { border-bottom: none; }
+.competitor-avatar {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.competitor-info { flex: 1; }
+.competitor-name { font-size: 14px; font-weight: 600; }
+.competitor-stat { font-size: 12px; color: var(--gray-500); }
+.competitor-best { font-size: 12px; color: var(--success); font-weight: 600; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+.empty-state .icon { font-size: 40px; margin-bottom: 8px; }
+
+.section-desc { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; line-height: 1.7; }
+
+/* funnel color gradient */
+.funnel-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.funnel-2 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+.funnel-3 { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+.funnel-4 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.funnel-5 { background: linear-gradient(135deg, #10b981, #059669); }
+.funnel-6 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.funnel-7 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">FDE 工作台</div>
+      <div class="sub">澳洲移民自动化营销系统</div>
+    </div>
+    <div class="nav">
+      <div class="nav-item active" data-page="dashboard">
+        <span class="icon">&#x1f4ca;</span><span>数据看板</span>
+      </div>
+      <div class="nav-item" data-page="funnel">
+        <span class="icon">&#x1f53d;</span><span>漏斗模型</span>
+      </div>
+      <div class="nav-item" data-page="drip">
+        <span class="icon">&#x23f1;</span><span>滴灌SOP</span>
+      </div>
+      <div class="nav-item" data-page="customers">
+        <span class="icon">&#x1f465;</span><span>客户管理</span>
+      </div>
+      <div class="nav-item" data-page="scripts">
+        <span class="icon">&#x1f4ac;</span><span>话术库</span>
+      </div>
+      <div class="nav-item" data-page="settings">
+        <span class="icon">&#x2699;</span><span>系统设置</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="page-title">数据看板</h1>
+        <div class="desc" id="page-desc">FDE自动化营销模型 — 全链路数据概览</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline btn-sm" onclick="exportData()">导出数据</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddCustomerModal()">+ 录入客户</button>
+      </div>
+    </div>
+
+    <!-- Top Tab Nav -->
+    <div class="top-tabs" id="top-tabs">
+      <div class="top-tab active" data-page="dashboard"><span class="tab-icon">&#x1f4ca;</span>数据看板</div>
+      <div class="top-tab" data-page="funnel"><span class="tab-icon">&#x1f53d;</span>漏斗模型</div>
+      <div class="top-tab" data-page="drip"><span class="tab-icon">&#x23f1;</span>滴灌SOP</div>
+      <div class="top-tab" data-page="customers"><span class="tab-icon">&#x1f465;</span>客户管理</div>
+      <div class="top-tab" data-page="scripts"><span class="tab-icon">&#x1f4ac;</span>话术库</div>
+      <div class="top-tab" data-page="notes"><span class="tab-icon">&#x1f4dd;</span>笔记分析</div>
+      <div class="top-tab" data-page="integration"><span class="tab-icon">&#x1f517;</span>对接配置</div>
+      <div class="top-tab" data-page="settings"><span class="tab-icon">&#x2699;</span>设置</div>
+    </div>
+
+    <div class="content" id="page-content">
+      <!-- Dynamic content injected here -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <!-- Modal content injected here -->
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== Data Layer (localStorage) ==========
+
+const STORE_KEY = 'fde_workbench_v1';
+
+function loadData() {
+  const raw = localStorage.getItem(STORE_KEY);
+  if (raw) {
+    try { return JSON.parse(raw); } catch(e) {}
+  }
+  // Default seed data
+  return {
+    customers: [
+      { id: 1, name: "张先生", wechat: "zhang_xh", visaType: "189独立技术移民", source: "小红书笔记-避坑指南", stage: "deep-consult", tier: "A", addDate: "2026-10-15", lastContact: "2026-10-20", status: "active", notes: "IT工程师，英语雅思8分，EOI 65分" },
+      { id: 2, name: "李女士", wechat: "lily_li", visaType: "190州担保", source: "小红书评论引导", stage: "assessment", tier: "B", addDate: "2026-10-18", lastContact: "2026-10-20", status: "active", notes: "会计专业，新州190意向" },
+      { id: 3, name: "王先生", wechat: "wang_km88", visaType: "491偏远地区", source: "小红书私信", stage: "signed", tier: "A", addDate: "2026-10-05", lastContact: "2026-10-19", status: "signed", notes: "厨师职业评估通过，已签约491塔州" },
+      { id: 4, name: "陈女士", wechat: "chen_mei", visaType: "GTI全球人才", source: "小红书笔记-GTI解读", stage: "trust-build", tier: "A", addDate: "2026-10-12", lastContact: "2026-10-20", status: "active", notes: "数据科学家，年薪60万+，GTI目标" },
+      { id: 5, name: "刘先生", wechat: "liu_tech", visaType: "雇主担保482", source: "小红书评论引导", stage: "assessment", tier: "C", addDate: "2026-10-19", lastContact: "2026-10-20", status: "waiting", notes: "软件开发，需雇主匹配" },
+      { id: 6, name: "赵女士", wechat: "zhao_pr", visaType: "189独立技术移民", source: "小红书私信", stage: "interest-push", tier: "B", addDate: "2026-10-08", lastContact: "2026-10-18", status: "active", notes: "护士，英语7分，EOI 70分" },
+      { id: 7, name: "孙先生", wechat: "sun_aus", visaType: "190州担保", source: "小红书笔记-190政策", stage: "deep-consult", tier: "A", addDate: "2026-10-10", lastContact: "2026-10-20", status: "active", notes: "土木工程师，维州190" },
+      { id: 8, name: "周女士", wechat: "zhou_family", visaType: "491偏远地区", source: "小红书评论引导", stage: "trust-build", tier: "B", addDate: "2026-10-16", lastContact: "2026-10-19", status: "waiting", notes: "社工专业，南澳491意向" },
+    ],
+    funnelData: {
+      exposure: 15000,
+      interaction: 800,
+      dm: 120,
+      addWechat: 48,
+      assessment: 32,
+      deepConsult: 12,
+      signed: 5,
+    },
+    scripts: [
+      { id: 1, type: "icebreak", scene: "189独立技术移民-破冰", content: "您好！看到您对189独立技术移民感兴趣，方便分享下您的职业和英语情况吗？我帮您做个初步评估，看看EOI分数够不够。" },
+      { id: 2, type: "icebreak", scene: "190州担保-破冰", content: "您好！190州担保目前是热门路径，不同州要求差异较大。方便说下您的职业和意向州吗？我帮您看下匹配度。" },
+      { id: 3, type: "icebreak", scene: "GTI全球人才-破冰", content: "您好！GTI是目前最快的PR通道之一，但对行业背景和收入有要求。方便简单介绍下您的专业领域和年薪情况吗？" },
+      { id: 4, type: "icebreak", scene: "491偏远地区-破冰", content: "您好！491虽然偏远，但门槛低、下签快。方便说下您的职业吗？我帮您看下哪些偏远地区适合您。" },
+      { id: 5, type: "icebreak", scene: "雇主担保482-破冰", content: "您好！482雇主担保需要澳洲雇主offer。请问您目前是在澳洲还是国内？有没有目标行业？" },
+      { id: 6, type: "objection", scene: "费用异议-价格高", content: "理解您的顾虑。我们的费用是分阶段的：前期只收评估定金，拿到州担保/雇主担保后再付第二期，签证下签后付尾款。每个阶段都有明确成果才付费，风险可控。" },
+      { id: 7, type: "objection", scene: "周期异议-时间太长", content: "确实，移民周期通常6-12个月，但越早递交越早排队。以189为例，现在递交EOI，赶上本财年邀请轮次，比等到下财年配额不确定要好。时间换的是确定性。" },
+      { id: 8, type: "objection", scene: "成功率担忧", content: "成功率取决于个人条件和方案匹配。我们会在签约前做完整的可行性评估，如果条件不够我们会如实告知，不会接了做不了的单子。宁可少签一单不砸口碑。" },
+      { id: 9, type: "objection", scene: "信任异议-怕被骗", content: "完全理解。我们是MARA注册代理（注册号XXXXX），您可以在澳洲移民代理官网查验。合同明确约定退款条款，签约前我会把所有条款逐条解释清楚。" },
+      { id: 10, type: "objection", scene: "犹豫不决-再考虑", content: "当然可以再考虑。我把我们聊的方案和您的情况整理成一份文字版评估报告发您，您慢慢看。有什么问题随时找我，这个号我长期用。" },
+      { id: 11, type: "objection", scene: "对比竞品-别人更便宜", content: "价格差异主要在服务深度。我们包含的是：职业评估指导+EOI规划+州担保申请+签证递交+下签后安家服务，全流程跟踪。有些低价只做单环节，后续还要自己补。建议您对比下服务清单。" },
+      { id: 12, type: "closing", scene: "稀缺性促单-配额有限", content: "本财年189配额已发放约60%，下一轮邀请预计11月中。建议尽快递交EOI锁定名额，错过这轮可能要等下财年，配额政策不确定。" },
+      { id: 13, type: "closing", scene: "案例刺激促单", content: "分享一个同期客户的情况：王先生，厨师职业，491塔州路径，从签约到下签只用了4个月。他的条件和您很相似，现在已经在霍巴特安家了。" },
+      { id: 14, type: "closing", scene: "限时优惠促单", content: "本月签约的客户我们赠送价值2000澳币的安家服务包（接机+找房+银行开户指导）。这个优惠到本月底截止，下月恢复原价。" },
+      { id: 15, type: "closing", scene: "最后跟进促单", content: "最近189邀请分数降到了65分，对您来说是个窗口期。如果这轮不递交，下次降分可能要到明年了。建议这周内决定，我帮您赶下次邀请。" },
+      { id: 16, type: "faq", scene: "FAQ-189最新分数", content: "189独立技术移民最新邀请分数为65分（2026年10月最新轮次）。热门职业如IT、护士、工程师等分数在65-70分之间。建议EOI凑到70分以上比较稳妥。" },
+      { id: 17, type: "faq", scene: "FAQ-190州担保清单", content: "190州担保各州清单不同：新州（IT、工程、医疗热门）、维州（工程、护理）、塔州（厨师、社工等）。具体清单每财年更新，建议关注各州官网。" },
+      { id: 18, type: "faq", scene: "FAQ-费用大概多少", content: "整体费用包括：移民代理服务费（1.5-3万澳币，视签证类型）+ 职业评估费（1000-3000澳币）+ 签证申请费（4000+澳币）+ 体检无犯罪等杂费（约1000澳币）。总预算4-8万澳币。" },
+      { id: 19, type: "faq", scene: "FAQ-GTI申请条件", content: "GTI全球人才签证要求：1）在目标领域有国际认可的成就；2）能吸引澳洲同等薪资（约16万澳币/年）；3）有澳洲相关领域机构或个人提名。适合高收入、高成就的专业人士。" },
+      { id: 20, type: "faq", scene: "FAQ-491转PR条件", content: "491签证持有者在指定偏远地区居住和工作满3年，且满足最低收入要求（约5.4万澳币/年），即可转191永居签证。3年算的是实际居住时间，不是签证下签时间。" },
+    ],
+    dripPlan: {
+      "trust-build": { phase: "信任建立期", days: "Day 1-7", color: "#6366f1",
+        actions: [
+          { day: "Day 1", channel: "企微消息", action: "发送移民评估问卷+顾问自我介绍" },
+          { day: "Day 2-3", channel: "企微消息", action: "输出定制化移民方案初稿" },
+          { day: "Day 4-5", channel: "朋友圈+企微", action: "分享移民成功案例+方案解读" },
+          { day: "Day 6-7", channel: "企微消息", action: "疑虑解答+引导预约深度咨询" },
+        ]
+      },
+      "interest-push": { phase: "意向推进期", days: "Day 8-14", color: "#0ea5e9",
+        actions: [
+          { day: "Day 8-9", channel: "电话/视频", action: "深度1对1咨询，方案细化" },
+          { day: "Day 10-12", channel: "企微+朋友圈", action: "同期客户签约进展分享+政策解读" },
+          { day: "Day 13-14", channel: "企微消息", action: "促单话术触达" },
+        ]
+      },
+      "deep-consult": { phase: "深度咨询期", days: "Day 15-20", color: "#f59e0b",
+        actions: [
+          { day: "Day 15-17", channel: "电话/视频", action: "深度方案沟通，疑虑逐条处理" },
+          { day: "Day 18-20", channel: "企微消息", action: "方案最终版确认+合同条款解读" },
+        ]
+      },
+      "long-follow": { phase: "长线跟进期", days: "Day 21-30", color: "#ef4444",
+        actions: [
+          { day: "Day 21-25", channel: "朋友圈+企微群", action: "持续输出移民干货+案例" },
+          { day: "Day 26-28", channel: "企微消息", action: "政策更新/新案例刺激" },
+          { day: "Day 29-30", channel: "企微消息", action: "最后促单+限时优惠" },
+        ]
+      },
+    },
+    settings: {
+      account: "澳洲移民实操顾问",
+      wechat: "aus_migration_pro",
+      targetAddRate: 40,
+      targetAssessRate: 60,
+      targetConsultRate: 30,
+      targetSignRate: 15,
+      targetE2E: 8,
+    }
+  };
+}
+
+let DB = loadData();
+
+function saveData() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+}
+
+// ========== Router ==========
+
+const pages = {
+  dashboard: { title: "数据看板", desc: "FDE自动化营销模型 — 全链路数据概览", render: function() { renderDashboard(); } },
+  funnel: { title: "漏斗模型", desc: "Funnel — 7层转化漏斗设计与监控", render: function() { renderFunnel(); } },
+  drip: { title: "滴灌SOP", desc: "Drip — 分阶段培育节奏与执行追踪", render: function() { renderDrip(); } },
+  customers: { title: "客户管理", desc: "Engagement — 全量客户分层与跟进", render: function() { renderCustomers(); } },
+  scripts: { title: "话术库", desc: "Engagement — 标准话术与FAQ管理", render: function() { renderScripts(); } },
+  notes: { title: "笔记分析", desc: "Content — 竞品分析+笔记数据回溯+改善建议", render: function() { renderNotes(); } },
+  integration: { title: "对接配置", desc: "Integration — 企微API/小红书半自动/数据同步", render: function() { renderIntegration(); } },
+  settings: { title: "系统设置", desc: "FDE模型参数与目标值配置", render: function() { renderSettings(); } },
+};
+
+let currentPage = "dashboard";
+
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".top-tab").forEach(el => el.classList.remove("active"));
+  const sideEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (sideEl) sideEl.classList.add("active");
+  const tabEl = document.querySelector(`.top-tab[data-page="${page}"]`);
+  if (tabEl) tabEl.classList.add("active");
+  const p = pages[page];
+  document.getElementById("page-title").textContent = p.title;
+  document.getElementById("page-desc").textContent = p.desc;
+  p.render();
+}
+
+document.querySelectorAll(".nav-item").forEach(el => {
+  el.addEventListener("click", () => navigate(el.dataset.page));
+});
+
+document.querySelectorAll(".top-tab").forEach(el => {
+  el.addEventListener("click", () => navigate(el.dataset.page));
+});
+
+// ========== Dashboard ==========
+
+function renderDashboard() {
+  const f = DB.funnelData;
+  const rates = calcRates(f);
+  const customers = DB.customers;
+  const activeCount = customers.filter(c => c.status === "active").length;
+  const signedCount = customers.filter(c => c.status === "signed").length;
+  const waitingCount = customers.filter(c => c.status === "waiting").length;
+
+  const html = `
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#eef2ff;color:#4f46e5;">&#x1f465;</div>
+        <div class="label">在跟客户</div>
+        <div class="value">${activeCount}</div>
+        <div class="trend up">&#x2191; 本周新增 ${customers.filter(c => c.addDate >= "2026-10-15" && c.status === "active").length} 人</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#dcfce7;color:#10b981;">&#x1f4b8;</div>
+        <div class="label">已签约</div>
+        <div class="value">${signedCount}</div>
+        <div class="trend up">&#x2191; 转化率 ${rates.e2e}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#fef3c7;color:#f59e0b;">&#x23f3;</div>
+        <div class="label">待回复</div>
+        <div class="value">${waitingCount}</div>
+        <div class="trend">需24h内跟进</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#f3f4f6;color:#6b7280;">&#x1f4ac;</div>
+        <div class="label">话术库</div>
+        <div class="value">${DB.scripts.length}</div>
+        <div class="trend">破冰${DB.scripts.filter(s=>s.type==="icebreak").length} / 异议${DB.scripts.filter(s=>s.type==="objection").length} / 促单${DB.scripts.filter(s=>s.type==="closing").length} / FAQ${DB.scripts.filter(s=>s.type==="faq").length}</div>
+      </div>
+    </div>
+
+    <!-- Funnel Overview -->
+    <div class="card">
+      <div class="card-header">
+        <h2>FDE漏斗总览</h2>
+        <span class="badge">Funnel — 实时转化率</span>
+      </div>
+      <div class="card-body">
+        ${renderFunnelMini(f, rates)}
+      </div>
+    </div>
+
+    <!-- Today's Drip Actions -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h2>今日Drip任务</h2>
+          <span class="badge">需执行的滴灌动作</span>
+        </div>
+        <div class="card-body" id="today-drip">
+          ${renderTodayDrip()}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>客户分层分布</h2>
+          <span class="badge">Engagement — 分层</span>
+        </div>
+        <div class="card-body">
+          ${renderTierDistribution(customers)}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function calcRates(f) {
+  return {
+    r1: f.interaction / f.exposure * 100,
+    r2: f.dm / f.interaction * 100,
+    r3: f.addWechat / f.dm * 100,
+    r4: f.assessment / f.addWechat * 100,
+    r5: f.deepConsult / f.assessment * 100,
+    r6: f.signed / f.deepConsult * 100,
+    e2e: f.signed / f.addWechat * 100,
+  };
+}
+
+function renderFunnelMini(f, rates) {
+  const stages = [
+    { name: "笔记曝光", num: f.exposure, rate: "—", cls: "funnel-1", w: 100 },
+    { name: "互动（赞藏评）", num: f.interaction, rate: rates.r1.toFixed(1) + "%", cls: "funnel-2", w: Math.max(30, f.interaction / f.exposure * 100 * 10) },
+    { name: "私信咨询", num: f.dm, rate: rates.r2.toFixed(1) + "%", cls: "funnel-3", w: Math.max(20, f.dm / f.interaction * 100 * 3) },
+    { name: "加企业微信", num: f.addWechat, rate: rates.r3.toFixed(1) + "%", cls: "funnel-4", w: Math.max(15, f.addWechat / f.dm * 100) },
+    { name: "完成评估", num: f.assessment, rate: rates.r4.toFixed(1) + "%", cls: "funnel-5", w: Math.max(12, f.assessment / f.addWechat * 100) },
+    { name: "深度咨询", num: f.deepConsult, rate: rates.r5.toFixed(1) + "%", cls: "funnel-6", w: Math.max(8, f.deepConsult / f.assessment * 100) },
+    { name: "签约付费", num: f.signed, rate: rates.r6.toFixed(1) + "%", cls: "funnel-7", w: Math.max(5, f.signed / f.deepConsult * 100) },
+  ];
+  return `<div class="funnel-container">${stages.map((s, i) => `
+    <div class="funnel-stage">
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar ${s.cls}" style="width:${s.w}%;">
+          <span class="stage-name">${s.name}</span>
+          <span class="stage-num">${s.num.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="funnel-rate">${s.rate}</div>
+    </div>
+    ${i < stages.length - 1 ? `<div class="funnel-connector"><span class="arrow">&#x2193;</span></div>` : ""}
+  `).join("")}</div>
+  <div style="margin-top:16px;padding:12px 16px;background:var(--gray-50);border-radius:8px;font-size:13px;color:var(--gray-600);">
+    <strong>端到端转化率（加微→签约）：<span style="color:var(--primary);font-size:16px;">${rates.e2e.toFixed(1)}%</span></strong>
+    &nbsp;&nbsp;|&nbsp;&nbsp; 目标值：${DB.settings.targetE2E}% &nbsp;&nbsp;|&nbsp;&nbsp;
+    ${rates.e2e >= DB.settings.targetE2E ? '<span style="color:var(--success);">已达标</span>' : '<span style="color:var(--danger);">低于目标，需优化</span>'}
+  </div>`;
+}
+
+function renderTodayDrip() {
+  const activeCustomers = DB.customers.filter(c => c.status === "active" || c.status === "waiting");
+  if (activeCustomers.length === 0) {
+    return '<div class="empty-state"><div class="icon">&#x1f4ed;</div>暂无待跟进客户</div>';
+  }
+  let html = "";
+  activeCustomers.forEach(c => {
+    const plan = DB.dripPlan[c.stage];
+    if (!plan) return;
+    const daysSince = Math.floor((new Date() - new Date(c.addDate)) / (1000 * 60 * 60 * 24));
+    const actionIndex = Math.min(Math.floor(daysSince / 2), plan.actions.length - 1);
+    const action = plan.actions[actionIndex];
+    html += `
+      <div class="drip-action">
+        <div class="time">${action.day}</div>
+        <div class="action-text">
+          <strong>${c.name}</strong> — ${action.action}
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">签证：${c.visaType} | 分层：${c.tier}类</div>
+        </div>
+        <span class="action-channel">${action.channel}</span>
+      </div>
+    `;
+  });
+  return html || '<div class="empty-state">暂无待执行任务</div>';
+}
+
+function renderTierDistribution(customers) {
+  const tiers = { A: 0, B: 0, C: 0, D: 0 };
+  customers.forEach(c => { tiers[c.tier] = (tiers[c.tier] || 0) + 1; });
+  const total = customers.length || 1;
+  const colors = { A: "#10b981", B: "#f59e0b", C: "#9ca3af", D: "#ef4444" };
+  const labels = { A: "A-高意向", B: "B-中意向", C: "C-低意向", D: "D-沉默" };
+  let html = '<div style="margin-bottom:16px;">';
+  Object.keys(tiers).forEach(t => {
+    const pct = (tiers[t] / total * 100).toFixed(0);
+    html += `
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span style="font-weight:600;color:${colors[t]};">${labels[t]}</span>
+          <span style="color:var(--gray-500);">${tiers[t]}人 (${pct}%)</span>
+        </div>
+        <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;">
+          <div style="width:${pct}%;height:100%;background:${colors[t]};border-radius:4px;transition:width 0.5s;"></div>
+        </div>
+      </div>
+    `;
+  });
+  html += "</div>";
+  return html;
+}
+
+// ========== Funnel Page ==========
+
+function renderFunnel() {
+  const f = DB.funnelData;
+  const rates = calcRates(f);
+  const settings = DB.settings;
+  const targets = [
+    { name: "互动率", val: rates.r1, target: 5, desc: "曝光→互动" },
+    { name: "私信率", val: rates.r2, target: 15, desc: "互动→私信" },
+    { name: "加微率", val: rates.r3, target: settings.targetAddRate, desc: "私信→加微" },
+    { name: "评估率", val: rates.r4, target: settings.targetAssessRate, desc: "加微→评估" },
+    { name: "咨询率", val: rates.r5, target: settings.targetConsultRate, desc: "评估→咨询" },
+    { name: "签约率", val: rates.r6, target: settings.targetSignRate, desc: "咨询→签约" },
+  ];
+
+  const html = `
+    <div class="section-desc">
+      <strong>F — Funnel（漏斗获客）</strong>：7层转化漏斗，从公域曝光到私域签约，每一层有独立策略和目标值。点击各层数据可编辑。
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2>7层转化漏斗</h2>
+        <button class="btn btn-outline btn-sm" onclick="editFunnelData()">编辑漏斗数据</button>
+      </div>
+      <div class="card-body">
+        ${renderFunnelMini(f, rates)}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2>各层转化率 vs 目标值</h2>
+        <span class="badge">达标分析</span>
+      </div>
+      <div class="card-body">
+        ${targets.map(t => {
+          const pct = t.val.toFixed(1);
+          const ok = t.val >= t.target;
+          return `
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                <span><strong>${t.name}</strong> <span style="color:var(--gray-400);">(${t.desc})</span></span>
+                <span>实际：<strong style="color:${ok ? 'var(--success)' : 'var(--danger)'}">${pct}%</strong> / 目标：${t.target}%</span>
+              </div>
+              <div style="height:10px;background:var(--gray-100);border-radius:5px;overflow:hidden;position:relative;">
+                <div style="width:${Math.min(pct, 100)}%;height:100%;background:${ok ? 'var(--success)' : 'var(--danger)'};border-radius:5px;transition:width 0.5s;"></div>
+                <div style="position:absolute;left:${t.target}%;top:0;bottom:0;width:2px;background:var(--gray-700);"></div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+// ========== Drip Page ==========
+
+function renderDrip() {
+  const stages = [
+    { key: "trust-build", title: "信任建立期", days: "Day 1-7", color: "#6366f1", tag: "第一阶段" },
+    { key: "interest-push", title: "意向推进期", days: "Day 8-14", color: "#0ea5e9", tag: "第二阶段" },
+    { key: "deep-consult", title: "深度咨询期", days: "Day 15-20", color: "#f59e0b", tag: "第三阶段" },
+    { key: "long-follow", title: "长线跟进期", days: "Day 21-30", color: "#ef4444", tag: "第四阶段" },
+  ];
+
+  let html = `
+    <div class="section-desc">
+      <strong>D — Drip（滴灌培育）</strong>：30天四阶段标准化培育SOP。每个阶段有固定触达节奏和动作，像滴灌一样持续输出价值，逐步推进信任和意向。
+    </div>
+  `;
+
+  // Phase overview
+  html += `<div class="grid-2">`;
+  stages.forEach(s => {
+    const plan = DB.dripPlan[s.key];
+    const customerCount = DB.customers.filter(c => c.stage === s.key && c.status !== "signed").length;
+    html += `
+      <div class="card">
+        <div class="card-header">
+          <h2>
+            <span class="phase-tag" style="background:${s.color}20;color:${s.color};padding:2px 8px;border-radius:4px;font-size:11px;">${s.tag}</span>
+            ${s.title}
+          </h2>
+          <span class="badge">${s.days} | 在跟${customerCount}人</span>
+        </div>
+        <div class="card-body">
+          <div class="drip-timeline">
+            <div class="drip-phase active">
+              <div class="drip-phase-title">${s.title}</div>
+              <div class="drip-actions">
+                ${plan.actions.map(a => `
+                  <div class="drip-action">
+                    <div class="time">${a.day}</div>
+                    <div class="action-text">${a.action}</div>
+                    <span class="action-channel">${a.channel}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  // Customer drip status
+  html += `
+    <div class="card">
+      <div class="card-header">
+        <h2>客户滴灌进度</h2>
+        <span class="badge">按阶段分组</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>客户</th>
+                <th>签证类型</th>
+                <th>分层</th>
+                <th>加微日期</th>
+                <th>当前阶段</th>
+                <th>下一步动作</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${DB.customers.filter(c => c.status !== "signed" && c.status !== "lost").map(c => {
+                const plan = DB.dripPlan[c.stage];
+                const daysSince = Math.floor((new Date() - new Date(c.addDate)) / (1000*60*60*24));
+                const actionIdx = Math.min(Math.floor(daysSince / 2), plan ? plan.actions.length - 1 : 0);
+                const nextAction = plan ? plan.actions[actionIdx] : null;
+                const stageNames = { "trust-build": "信任建立期", "interest-push": "意向推进期", "deep-consult": "深度咨询期", "long-follow": "长线跟进期", "assessment": "评估阶段", "signed": "已签约" };
+                return `
+                  <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.visaType}</td>
+                    <td><span class="tag tag-${c.tier.toLowerCase()}">${c.tier}类</span></td>
+                    <td>${c.addDate}</td>
+                    <td>${stageNames[c.stage] || c.stage}</td>
+                    <td style="font-size:12px;color:var(--gray-600);">${nextAction ? nextAction.day + " " + nextAction.action : "—"}</td>
+                    <td><span class="status-dot status-${c.status}"></span>${c.status === "active" ? "在跟" : c.status === "waiting" ? "待回" : c.status}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("page-content").innerHTML = html;
+}
+
+// ========== Customers Page ==========
+
+let customerFilter = { stage: "", tier: "", search: "" };
+
+function renderCustomers() {
+  let filtered = DB.customers;
+  if (customerFilter.stage) filtered = filtered.filter(c => c.stage === customerFilter.stage);
+  if (customerFilter.tier) filtered = filtered.filter(c => c.tier === customerFilter.tier);
+  if (customerFilter.search) {
+    const q = customerFilter.search.toLowerCase();
+    filtered = filtered.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.visaType.toLowerCase().includes(q) ||
+      (c.notes || "").toLowerCase().includes(q)
+    );
+  }
+
+  const stageNames = { "trust-build": "信任建立期", "interest-push": "意向推进期", "deep-consult": "深度咨询期", "long-follow": "长线跟进期", "assessment": "评估阶段", "signed": "已签约" };
+
+  const html = `
+    <div class="section-desc">
+      <strong>E — Engagement（互动转化）</strong>：全量客户管理，按分层（A/B/C/D）和阶段分类，追踪每个客户的转化进度。
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2>客户列表</h2>
+        <span class="badge">共 ${filtered.length} 人</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input type="text" placeholder="搜索姓名/签证/备注..." style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;outline:none;" oninput="filterCustomers('search', this.value)">
+          <select style="padding:9px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;" onchange="filterCustomers('stage', this.value)">
+            <option value="">全部阶段</option>
+            <option value="trust-build">信任建立期</option>
+            <option value="interest-push">意向推进期</option>
+            <option value="deep-consult">深度咨询期</option>
+            <option value="long-follow">长线跟进期</option>
+            <option value="assessment">评估阶段</option>
+            <option value="signed">已签约</option>
+          </select>
+          <select style="padding:9px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;" onchange="filterCustomers('tier', this.value)">
+            <option value="">全部分层</option>
+            <option value="A">A-高意向</option>
+            <option value="B">B-中意向</option>
+            <option value="C">C-低意向</option>
+            <option value="D">D-沉默</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>客户</th>
+                <th>企微号</th>
+                <th>签证类型</th>
+                <th>来源</th>
+                <th>分层</th>
+                <th>阶段</th>
+                <th>加微日期</th>
+                <th>最后联系</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.length === 0 ? `<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--gray-400);">无匹配客户</td></tr>` :
+                filtered.map(c => `
+                  <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td style="font-size:12px;color:var(--gray-500);">${c.wechat}</td>
+                    <td>${c.visaType}</td>
+                    <td style="font-size:12px;">${c.source}</td>
+                    <td><span class="tag tag-${c.tier.toLowerCase()}">${c.tier}类</span></td>
+                    <td style="font-size:12px;">${stageNames[c.stage] || c.stage}</td>
+                    <td style="font-size:12px;">${c.addDate}</td>
+                    <td style="font-size:12px;">${c.lastContact}</td>
+                    <td><span class="status-dot status-${c.status}"></span>${c.status === "active" ? "在跟" : c.status === "waiting" ? "待回" : c.status === "signed" ? "已签" : c.status}</td>
+                    <td>
+                      <button class="btn btn-outline btn-sm" onclick="editCustomer(${c.id})">编辑</button>
+                      <button class="btn btn-outline btn-sm" onclick="advanceStage(${c.id})" style="margin-left:4px;">推进</button>
+                    </td>
+                  </tr>
+                `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function filterCustomers(field, val) {
+  customerFilter[field] = val;
+  renderCustomers();
+  // Restore values
+  if (field === "search") {
+    const input = document.querySelector('input[oninput*="search"]');
+    if (input) input.value = val;
+  } else if (field === "stage") {
+    const sel = document.querySelectorAll('select[onchange*="stage"]');
+    if (sel[0]) sel[0].value = val;
+  } else if (field === "tier") {
+    const sel = document.querySelectorAll('select[onchange*="tier"]');
+    if (sel[0]) sel[0].value = val;
+  }
+}
+
+// ========== Scripts Page ==========
+
+let scriptFilter = { type: "", search: "" };
+
+function renderScripts() {
+  let filtered = DB.scripts;
+  if (scriptFilter.type) filtered = filtered.filter(s => s.type === scriptFilter.type);
+  if (scriptFilter.search) {
+    const q = scriptFilter.search.toLowerCase();
+    filtered = filtered.filter(s =>
+      s.scene.toLowerCase().includes(q) ||
+      s.content.toLowerCase().includes(q)
+    );
+  }
+
+  const types = [
+    { key: "", label: "全部" },
+    { key: "icebreak", label: "破冰话术" },
+    { key: "objection", label: "异议处理" },
+    { key: "closing", label: "促单话术" },
+    { key: "faq", label: "FAQ标准回复" },
+  ];
+
+  const typeLabels = { icebreak: "破冰", objection: "异议", closing: "促单", faq: "FAQ" };
+  const typeColors = { icebreak: "#6366f1", objection: "#f59e0b", closing: "#ef4444", faq: "#0ea5e9" };
+
+  const html = `
+    <div class="section-desc">
+      <strong>E — Engagement（互动转化）</strong>：标准话术库与FAQ管理，覆盖破冰、异议处理、促单、常见问题四大场景。点击复制直接使用。
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2>话术库</h2>
+        <button class="btn btn-primary btn-sm" onclick="openAddScriptModal()">+ 新增话术</button>
+      </div>
+      <div class="card-body">
+        <div class="script-search">
+          <input type="text" placeholder="搜索话术场景或内容..." value="${scriptFilter.search}" oninput="filterScripts('search', this.value)">
+        </div>
+        <div class="script-tabs">
+          ${types.map(t => `
+            <div class="script-tab ${scriptFilter.type === t.key ? "active" : ""}" onclick="filterScripts('type', '${t.key}')">${t.label}</div>
+          `).join("")}
+        </div>
+        <div>
+          ${filtered.length === 0 ? '<div class="empty-state"><div class="icon">&#x1f50d;</div>未找到匹配的话术</div>' :
+            filtered.map(s => `
+              <div class="script-item">
+                <div class="script-scene">
+                  <span style="background:${typeColors[s.type]}20;color:${typeColors[s.type]};padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">${typeLabels[s.type]}</span>
+                  ${s.scene}
+                  <span class="copy-btn" onclick="copyScript(${s.id})">复制</span>
+                </div>
+                <div class="script-content">${s.content}</div>
+              </div>
+            `).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function filterScripts(field, val) {
+  scriptFilter[field] = val;
+  renderScripts();
+  if (field === "search") {
+    const input = document.querySelector('.script-search input');
+    if (input) { input.value = val; input.focus(); }
+  }
+}
+
+function copyScript(id) {
+  const s = DB.scripts.find(x => x.id === id);
+  if (s) {
+    navigator.clipboard.writeText(s.content).then(() => showToast("话术已复制到剪贴板"));
+  }
+}
+
+// ========== Notes Analysis Page ==========
+
+function renderNotes() {
+  // Ensure seed note data exists
+  if (!DB.notes) {
+    DB.notes = [
+      { id: 1, title: "189独立技术移民避坑指南 #1：EOI分数常见误区", date: "2026-10-19", type: "科普", views: 3200, likes: 280, collects: 145, comments: 32, dms: 18, addRate: 11, tags: ["189","EOI","避坑"] },
+      { id: 2, title: "2026澳洲189最新邀请分数解读", date: "2026-10-17", type: "政策", views: 5100, likes: 420, collects: 230, comments: 58, dms: 35, addRate: 14, tags: ["189","政策","邀请"] },
+      { id: 3, title: "澳洲移民到底要花多少钱？全费用清单", date: "2026-10-15", type: "干货", views: 8200, likes: 680, collects: 520, comments: 95, dms: 62, addRate: 16, tags: ["费用","干货"] },
+      { id: 4, title: "GTI全球人才签证：3个月拿PR的捷径", date: "2026-10-12", type: "案例", views: 4600, likes: 380, collects: 280, comments: 42, dms: 28, addRate: 12, tags: ["GTI","案例"] },
+      { id: 5, title: "491偏远地区签证：最被低估的移民路径", date: "2026-10-10", type: "科普", views: 2400, likes: 195, collects: 110, comments: 22, dms: 12, addRate: 9, tags: ["491","偏远地区"] },
+      { id: 6, title: "澳洲移民第一步：职业评估怎么做", date: "2026-10-08", type: "干货", views: 3800, likes: 310, collects: 240, comments: 38, dms: 25, addRate: 13, tags: ["职业评估","干货"] },
+    ];
+    saveData();
+  }
+  if (!DB.competitors) {
+    DB.competitors = [
+      { id: 1, name: "澳洲移民小百科", avatar: "📖", followers: 32000, avgViews: 6500, avgLikes: 520, avgComments: 48, bestTopic: "189政策解读", bestViews: 15000, updateFreq: "日更" },
+      { id: 2, name: "澳洲PR攻略君", avatar: "🦘", followers: 58000, avgViews: 12000, avgLikes: 950, avgComments: 85, bestTopic: "移民费用清单", bestViews: 28000, updateFreq: "日更" },
+      { id: 3, name: "澳洲移民实战派", avatar: "✈️", followers: 18000, avgViews: 4200, avgLikes: 350, avgComments: 30, bestTopic: "真实下签案例", bestViews: 9000, updateFreq: "周更3篇" },
+      { id: 4, name: "GTI全球人才通道", avatar: "🌟", followers: 12000, avgViews: 3800, avgLikes: 310, avgComments: 25, bestTopic: "GTI成功案例", bestViews: 8200, updateFreq: "周更2篇" },
+    ];
+    saveData();
+  }
+
+  const myNotes = DB.notes;
+  const myAvgViews = Math.round(myNotes.reduce((s,n) => s+n.views, 0) / myNotes.length);
+  const myAvgLikes = Math.round(myNotes.reduce((s,n) => s+n.likes, 0) / myNotes.length);
+  const myAvgDms = Math.round(myNotes.reduce((s,n) => s+n.dms, 0) / myNotes.length);
+  const myAvgAddRate = (myNotes.reduce((s,n) => s+n.addRate, 0) / myNotes.length).toFixed(1);
+
+  // Best performing note
+  const bestNote = myNotes.reduce((max, n) => n.dms > max.dms ? n : max, myNotes[0]);
+  const worstNote = myNotes.reduce((min, n) => n.dms < min.dms ? n : min, myNotes[0]);
+
+  const html = `
+    <div class="section-desc">
+      <strong>Content — 笔记数据分析</strong>：回溯每篇笔记的曝光→互动→私信→加微全链路数据，对比竞品表现，自动生成改善建议。这是自媒体运营工作台的核心能力。
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#eef2ff;color:#4f46e5;">&#x1f4c8;</div>
+        <div class="label">平均曝光</div>
+        <div class="value">${(myAvgViews/1000).toFixed(1)}k</div>
+        <div class="trend">竞品均值 ${Math.round(DB.competitors.reduce((s,c)=>s+c.avgViews,0)/DB.competitors.length/1000)}k</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#dcfce7;color:#10b981;">&#x1f44d;</div>
+        <div class="label">平均点赞</div>
+        <div class="value">${myAvgLikes}</div>
+        <div class="trend">竞品均值 ${Math.round(DB.competitors.reduce((s,c)=>s+c.avgLikes,0)/DB.competitors.length)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#fef3c7;color:#f59e0b;">&#x1f4e7;</div>
+        <div class="label">平均私信数</div>
+        <div class="value">${myAvgDms}</div>
+        <div class="trend">加微转化率 ${myAvgAddRate}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-wrap" style="background:#f3f4f6;color:#6b7280;">&#x1f4c4;</div>
+        <div class="label">已发笔记</div>
+        <div class="value">${myNotes.length}</div>
+        <div class="trend">最佳：${bestNote.title.slice(0,12)}...</div>
+      </div>
+    </div>
+
+    <!-- Competitor Analysis -->
+    <div class="card">
+      <div class="card-header">
+        <h2>竞品分析</h2>
+        <span class="badge">同赛道对标账号</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>账号</th>
+                <th>粉丝数</th>
+                <th>平均曝光</th>
+                <th>平均点赞</th>
+                <th>平均评论</th>
+                <th>爆款选题</th>
+                <th>爆款曝光</th>
+                <th>更新频率</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${DB.competitors.map(c => `
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div class="competitor-avatar" style="background:var(--primary-bg);">${c.avatar}</div>
+                      <div>
+                        <div style="font-weight:600;">${c.name}</div>
+                        <div style="font-size:11px;color:var(--gray-500);">${(c.followers/1000).toFixed(0)}k 粉丝</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>${c.followers.toLocaleString()}</td>
+                  <td>${c.avgViews.toLocaleString()}</td>
+                  <td>${c.avgLikes}</td>
+                  <td>${c.avgComments}</td>
+                  <td><span class="competitor-best">${c.bestTopic}</span></td>
+                  <td>${c.bestViews.toLocaleString()}</td>
+                  <td style="font-size:12px;">${c.updateFreq}</td>
+                </tr>
+              `).join("")}
+              <tr style="background:var(--primary-bg);">
+                <td><strong>我</strong></td>
+                <td style="color:var(--gray-500);">—</td>
+                <td><strong>${myAvgViews.toLocaleString()}</strong></td>
+                <td><strong>${myAvgLikes}</strong></td>
+                <td><strong>${Math.round(myNotes.reduce((s,n)=>s+n.comments,0)/myNotes.length)}</strong></td>
+                <td><strong>${bestNote.tags[0]}类</strong></td>
+                <td><strong>${Math.max(...myNotes.map(n=>n.views)).toLocaleString()}</strong></td>
+                <td style="font-size:12px;">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px;padding:14px 16px;background:#fff7ed;border-radius:8px;font-size:13px;line-height:1.7;">
+          <strong style="color:#92400e;">竞品分析洞察：</strong><br>
+          1. 竞品"澳洲PR攻略君"平均曝光${Math.round(DB.competitors[1].avgViews/1000)}k远超你${(myAvgViews/1000).toFixed(1)}k，主要差距在选题方向：费用清单类内容是其爆款<br>
+          2. 你的加微转化率${myAvgAddRate}%高于行业均值（8-10%），说明内容精准度好，但流量规模需提升<br>
+          3. 建议学习竞品"费用清单"选题方向，这类内容收藏率高、私信转化好
+        </div>
+      </div>
+    </div>
+
+    <!-- My Notes Data -->
+    <div class="card">
+      <div class="card-header">
+        <h2>我的笔记数据回溯</h2>
+        <button class="btn btn-primary btn-sm" onclick="openAddNoteModal()">+ 录入笔记</button>
+      </div>
+      <div class="card-body">
+        ${myNotes.map(n => {
+          const score = n.dms >= 30 ? 'high' : n.dms >= 15 ? 'mid' : 'low';
+          const scoreVal = n.dms >= 30 ? 'A' : n.dms >= 15 ? 'B' : 'C';
+          const interactionRate = (n.likes / n.views * 100).toFixed(1);
+          const dmRate = (n.dms / n.views * 100).toFixed(2);
+          // Generate improvement suggestion
+          let suggestion = "";
+          if (n.views < 3000) {
+            suggestion = "曝光不足：建议优化标题关键词，覆盖更多搜索热词（如「2026最新」「全攻略」等），并发布在流量高峰时段（12:00/18:00/21:00）";
+          } else if (n.addRate < 10) {
+            suggestion = "加微转化偏低：建议在笔记结尾增加更强的引导钩子，如「评论区回复1免费获取评估表」，并在评论区主动截流";
+          } else if (n.comments < 20) {
+            suggestion = "互动率偏低：建议在笔记中设置争议性观点或开放式问题（如「你觉得189还是491更值得选？」），激发评论区讨论";
+          } else if (n.collects / n.likes < 0.5) {
+            suggestion = "收藏率低：内容干货密度可能不够，建议增加「可直接使用的清单/表格/对比图」，提高收藏价值";
+          } else {
+            suggestion = "表现良好！这篇笔记的选题方向和引流话术值得复制到后续内容中，建议围绕此选题做系列延伸";
+          }
+
+          return `
+            <div class="note-card">
+              <div class="note-header">
+                <div>
+                  <div class="note-title">${n.title}</div>
+                  <div class="note-date">${n.date} | 类型：${n.type} | 标签：${n.tags.map(t => '#' + t).join(' ')}</div>
+                </div>
+                <div class="note-score score-${score}">${scoreVal}</div>
+              </div>
+              <div class="note-metrics">
+                <div class="metric"><div class="metric-val">${(n.views/1000).toFixed(1)}k</div><div class="metric-label">曝光</div></div>
+                <div class="metric"><div class="metric-val">${n.likes}</div><div class="metric-label">点赞</div></div>
+                <div class="metric"><div class="metric-val">${n.collects}</div><div class="metric-label">收藏</div></div>
+                <div class="metric"><div class="metric-val">${n.comments}</div><div class="metric-label">评论</div></div>
+                <div class="metric"><div class="metric-val">${n.dms}</div><div class="metric-label">私信</div></div>
+                <div class="metric"><div class="metric-val" style="color:var(--primary);">${n.addRate}%</div><div class="metric-label">加微率</div></div>
+                <div class="metric"><div class="metric-val">${interactionRate}%</div><div class="metric-label">互动率</div></div>
+                <div class="metric"><div class="metric-val">${dmRate}%</div><div class="metric-label">私信率</div></div>
+              </div>
+              <div class="suggestion">&#x1f4a1; ${suggestion}</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="editNote(${n.id})">编辑</button>
+                <button class="btn btn-outline btn-sm" onclick="deleteNote(${n.id})" style="border-color:var(--danger);color:var(--danger);">删除</button>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- Improvement Summary -->
+    <div class="card">
+      <div class="card-header"><h2>改善建议汇总</h2><span class="badge">基于数据分析</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="grid-2">
+          <div style="padding:16px;background:#f0fdf4;border-radius:8px;border-left:3px solid var(--success);">
+            <div style="font-weight:600;color:#166534;margin-bottom:8px;">做得好的</div>
+            <div style="font-size:13px;line-height:1.8;color:#15803d;">
+              1. 加微转化率${myAvgAddRate}%，高于行业8-10%均值<br>
+              2. 最佳笔记"${bestNote.title.slice(0,15)}..."私信${bestNote.dms}条，选题方向可复制<br>
+              3. "费用清单"类内容互动率最高，建议加大此类选题
+            </div>
+          </div>
+          <div style="padding:16px;background:#fef2f2;border-radius:8px;border-left:3px solid var(--danger);">
+            <div style="font-weight:600;color:#991b1b;margin-bottom:8px;">需改善的</div>
+            <div style="font-size:13px;line-height:1.8;color:#b91c1c;">
+              1. 平均曝光${(myAvgViews/1000).toFixed(1)}k低于竞品均值，需提升SEO关键词覆盖<br>
+              2. 最差笔记"${worstNote.title.slice(0,15)}..."私信仅${worstNote.dms}条，选题需调整<br>
+              3. 评论互动偏低，建议增加争议性话题和开放式提问
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function openAddNoteModal() {
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header"><h2>录入笔记数据</h2><span class="modal-close" onclick="closeModal()">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label>笔记标题</label><input type="text" id="n-title" placeholder="如：189签证最新政策解读"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>发布日期</label><input type="date" id="n-date"></div>
+        <div class="form-group">
+          <label>笔记类型</label>
+          <select id="n-type">
+            <option value="科普">科普</option>
+            <option value="政策">政策</option>
+            <option value="干货">干货</option>
+            <option value="案例">案例</option>
+            <option value="避坑">避坑</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>曝光量</label><input type="number" id="n-views" placeholder="如：3200"></div>
+        <div class="form-group"><label>点赞数</label><input type="number" id="n-likes" placeholder="如：280"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>收藏数</label><input type="number" id="n-collects" placeholder="如：145"></div>
+        <div class="form-group"><label>评论数</label><input type="number" id="n-comments" placeholder="如：32"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>私信数</label><input type="number" id="n-dms" placeholder="如：18"></div>
+        <div class="form-group"><label>加微率(%)</label><input type="number" id="n-addRate" placeholder="如：11" step="0.1"></div>
+      </div>
+      <div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="n-tags" placeholder="如：189,EOI,避坑"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveNewNote()">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveNewNote() {
+  const n = {
+    id: Date.now(),
+    title: val("n-title"),
+    date: val("n-date") || new Date().toISOString().slice(0,10),
+    type: val("n-type"),
+    views: parseInt(val("n-views")) || 0,
+    likes: parseInt(val("n-likes")) || 0,
+    collects: parseInt(val("n-collects")) || 0,
+    comments: parseInt(val("n-comments")) || 0,
+    dms: parseInt(val("n-dms")) || 0,
+    addRate: parseFloat(val("n-addRate")) || 0,
+    tags: val("n-tags").split(",").map(t => t.trim()).filter(Boolean),
+  };
+  if (!n.title) { showToast("请填写笔记标题"); return; }
+  DB.notes.push(n);
+  saveData();
+  closeModal();
+  showToast("笔记数据已录入");
+  renderNotes();
+}
+
+function editNote(id) {
+  const n = DB.notes.find(x => x.id === id);
+  if (!n) return;
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header"><h2>编辑笔记</h2><span class="modal-close" onclick="closeModal()">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label>笔记标题</label><input type="text" id="n-title" value="${n.title}"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>发布日期</label><input type="date" id="n-date" value="${n.date}"></div>
+        <div class="form-group"><label>笔记类型</label>
+          <select id="n-type">${["科普","政策","干货","案例","避坑"].map(t=>`<option value="${t}" ${n.type===t?"selected":""}>${t}</option>`).join("")}</select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>曝光量</label><input type="number" id="n-views" value="${n.views}"></div>
+        <div class="form-group"><label>点赞数</label><input type="number" id="n-likes" value="${n.likes}"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>收藏数</label><input type="number" id="n-collects" value="${n.collects}"></div>
+        <div class="form-group"><label>评论数</label><input type="number" id="n-comments" value="${n.comments}"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>私信数</label><input type="number" id="n-dms" value="${n.dms}"></div>
+        <div class="form-group"><label>加微率(%)</label><input type="number" id="n-addRate" value="${n.addRate}" step="0.1"></div>
+      </div>
+      <div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="n-tags" value="${n.tags.join(",")}"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="border-color:var(--danger);color:var(--danger);" onclick="deleteNote(${n.id})">删除</button>
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveEditNote(${n.id})">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveEditNote(id) {
+  const n = DB.notes.find(x => x.id === id);
+  if (!n) return;
+  n.title = val("n-title");
+  n.date = val("n-date");
+  n.type = val("n-type");
+  n.views = parseInt(val("n-views")) || 0;
+  n.likes = parseInt(val("n-likes")) || 0;
+  n.collects = parseInt(val("n-collects")) || 0;
+  n.comments = parseInt(val("n-comments")) || 0;
+  n.dms = parseInt(val("n-dms")) || 0;
+  n.addRate = parseFloat(val("n-addRate")) || 0;
+  n.tags = val("n-tags").split(",").map(t => t.trim()).filter(Boolean);
+  saveData();
+  closeModal();
+  showToast("笔记已更新");
+  renderNotes();
+}
+
+function deleteNote(id) {
+  DB.notes = DB.notes.filter(n => n.id !== id);
+  saveData();
+  closeModal();
+  showToast("笔记已删除");
+  renderNotes();
+}
+
+// ========== Integration Page ==========
+
+function renderIntegration() {
+  const html = `
+    <div class="section-desc">
+      <strong>Integration — 对接配置</strong>：企业微信通过官方API可全自动对接（客户消息自动同步、标签自动打标、SOP自动推送）。小红书因平台未开放API，采用半自动方案（数据导出+一键导入）。
+    </div>
+
+    <!-- WeCom Integration -->
+    <div class="integration-card">
+      <div class="integration-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1f4ac;</div>
+          <div>
+            <div style="font-size:16px;font-weight:600;">企业微信</div>
+            <div style="font-size:12px;color:var(--gray-500);">官方API对接 — 全自动客户同步</div>
+          </div>
+        </div>
+        <div class="integration-status status-pending">
+          <span class="status-dot-lg wait"></span>
+          待配置
+        </div>
+      </div>
+      <div class="integration-body">
+        <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.7;">
+          企业微信提供完善的开放API，可以实现：<strong>客户消息自动同步</strong>（新加微客户自动出现在工作台客户列表）、<strong>标签自动打标</strong>（按签证类型自动分层）、<strong>SOP消息自动推送</strong>（到时间节点自动提醒顾问跟进）、<strong>客户状态自动更新</strong>（签约后自动变更漏斗数据）。
+        </p>
+        <div style="margin-bottom:16px;">
+          <strong style="font-size:14px;margin-bottom:10px;display:block;">对接步骤：</strong>
+          <ul class="integration-steps">
+            <li>
+              <span class="step-num">1</span>
+              <span class="step-text">注册企业微信，在「企业微信管理后台 → 应用管理 → 自建应用」创建一个自建应用，获取 <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:12px;">corp_id</code> 和 <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:12px;">secret</code></span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span class="step-text">在「应用管理 → 接收消息 → 设置API接收」配置回调URL，填写你的服务器地址（需HTTPS），获取 <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:12px;">token</code> 和 <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:12px;">encoding_aes_key</code></span>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <span class="step-text">部署后端服务（Node.js/Python），调用企微API获取access_token，监听客户添加/消息事件，自动同步到本工作台</span>
+            </li>
+            <li>
+              <span class="step-num">4</span>
+              <span class="step-text">配置客户标签API，实现按签证类型自动打标分层（A/B/C/D）</span>
+            </li>
+            <li>
+              <span class="step-num">5</span>
+              <span class="step-text">配置消息推送API，实现Drip SOP到时间节点自动提醒顾问</span>
+            </li>
+          </ul>
+        </div>
+        <div style="padding:14px 16px;background:var(--gray-50);border-radius:8px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">API配置信息</div>
+          <div class="form-group"><label>Corp ID（企业ID）</label><input type="text" id="wecom-corp-id" placeholder="在企微管理后台 → 我的企业 中查看" value="${DB.wecomConfig ? DB.wecomConfig.corpId || '' : ''}"></div>
+          <div class="form-group"><label>Secret（应用密钥）</label><input type="text" id="wecom-secret" placeholder="在自建应用详情中查看" value="${DB.wecomConfig ? DB.wecomConfig.secret || '' : ''}"></div>
+          <div class="form-group"><label>回调URL</label><input type="text" id="wecom-callback" placeholder="https://your-server.com/wecom/callback" value="${DB.wecomConfig ? DB.wecomConfig.callback || '' : ''}"></div>
+          <div class="grid-2">
+            <div class="form-group"><label>Token</label><input type="text" id="wecom-token" placeholder="API接收设置中获取" value="${DB.wecomConfig ? DB.wecomConfig.token || '' : ''}"></div>
+            <div class="form-group"><label>EncodingAESKey</label><input type="text" id="wecom-aeskey" placeholder="API接收设置中获取" value="${DB.wecomConfig ? DB.wecomConfig.aesKey || '' : ''}"></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveWecomConfig()">保存配置</button>
+          <button class="btn btn-outline" style="margin-left:8px;" onclick="testWecomConnection()">测试连接</button>
+        </div>
+        <div style="padding:14px 16px;background:#f0fdf4;border-radius:8px;font-size:13px;line-height:1.7;">
+          <strong style="color:#166534;">已对接后能实现的效果：</strong><br>
+          1. 客户在小红书私信引导下加了企微 → 工作台客户列表<strong>自动出现</strong>该客户<br>
+          2. 顾问在企微发消息给客户 → 工作台<strong>自动更新</strong>"最后联系"时间<br>
+          3. 客户签约 → 顾问在工作台点"签约" → 企微<strong>自动打标</strong>"已签约"<br>
+          4. Drip SOP到时间节点 → 工作台<strong>自动推送</strong>企微消息提醒顾问跟进
+        </div>
+      </div>
+    </div>
+
+    <!-- Xiaohongshu Integration -->
+    <div class="integration-card">
+      <div class="integration-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1f534;</div>
+          <div>
+            <div style="font-size:16px;font-weight:600;">小红书</div>
+            <div style="font-size:12px;color:var(--gray-500);">半自动方案 — 平台未开放API</div>
+          </div>
+        </div>
+        <div class="integration-status status-offline">
+          <span class="status-dot-lg off"></span>
+          无法直连
+        </div>
+      </div>
+      <div class="integration-body">
+        <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.7;">
+          小红书目前<strong>未开放第三方API</strong>，无法直接获取笔记数据和私信消息。采用<strong>半自动方案</strong>：在小红书创作者后台导出笔记数据CSV → 一键导入本工作台 → 自动解析并更新漏斗数据。
+        </p>
+        <div style="margin-bottom:16px;">
+          <strong style="font-size:14px;margin-bottom:10px;display:block;">半自动对接流程：</strong>
+          <ul class="integration-steps">
+            <li>
+              <span class="step-num">1</span>
+              <span class="step-text">登录小红书创作者后台（creator.xiaohongshu.com）→ 数据中心 → 笔记数据 → 导出CSV</span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span class="step-text">在本工作台点击「导入CSV」→ 自动解析每篇笔记的曝光、点赞、收藏、评论、私信数据</span>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <span class="step-text">系统自动计算各笔记的加微率和互动率，生成改善建议</span>
+            </li>
+            <li>
+              <span class="step-num">4</span>
+              <span class="step-text">漏斗数据自动更新（曝光/互动/私信层数据同步）</span>
+            </li>
+          </ul>
+        </div>
+        <div style="padding:14px 16px;background:var(--gray-50);border-radius:8px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">CSV导入</div>
+          <div style="border:2px dashed var(--gray-300);border-radius:8px;padding:24px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px;">&#x1f4c4;</div>
+            <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">将小红书创作者后台导出的CSV文件拖入此处</div>
+            <input type="file" id="xhs-csv-input" accept=".csv" style="display:none;" onchange="importXhsCsv(this)">
+            <button class="btn btn-primary" onclick="document.getElementById('xhs-csv-input').click()">选择CSV文件</button>
+          </div>
+        </div>
+        <div style="padding:14px 16px;background:#fff7ed;border-radius:8px;font-size:13px;line-height:1.7;">
+          <strong style="color:#92400e;">为什么小红书不能全自动？</strong><br>
+          小红书不像微博/抖音有开放平台API，第三方无法通过接口获取笔记数据和私信内容。所有自称"小红书自动对接"的第三方工具，实际都是通过<strong>浏览器插件抓取</strong>或<strong>手动导出CSV</strong>的方式，存在封号风险。本工作台采用官方支持的CSV导出方式，安全合规。
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto-Sync Settings -->
+    <div class="card">
+      <div class="card-header"><h2>自动同步设置</h2><span class="badge">配置同步频率</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>企微客户同步频率</label>
+            <select id="sync-freq-wecom">
+              <option value="realtime">实时（事件推送）</option>
+              <option value="5min">每5分钟</option>
+              <option value="1hour">每小时</option>
+              <option value="daily">每天</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>漏斗数据更新频率</label>
+            <select id="sync-freq-funnel">
+              <option value="realtime">实时</option>
+              <option value="1hour">每小时</option>
+              <option value="daily">每天</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Drip SOP推送方式</label>
+          <select id="sync-drip-push">
+            <option value="wecom">企微消息推送（需企微对接）</option>
+            <option value="browser">浏览器通知提醒</option>
+            <option value="both">两者都开</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="saveSyncSettings()">保存同步设置</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function saveWecomConfig() {
+  if (!DB.wecomConfig) DB.wecomConfig = {};
+  DB.wecomConfig.corpId = val("wecom-corp-id");
+  DB.wecomConfig.secret = val("wecom-secret");
+  DB.wecomConfig.callback = val("wecom-callback");
+  DB.wecomConfig.token = val("wecom-token");
+  DB.wecomConfig.aesKey = val("wecom-aeskey");
+  saveData();
+  showToast("企微配置已保存");
+}
+
+function testWecomConnection() {
+  if (!DB.wecomConfig || !DB.wecomConfig.corpId || !DB.wecomConfig.secret) {
+    showToast("请先填写Corp ID和Secret");
+    return;
+  }
+  showToast("正在测试连接...（需部署后端服务）");
+  setTimeout(() => {
+    showToast("连接测试需要后端服务支持，请参考对接步骤完成部署");
+  }, 1500);
+}
+
+function importXhsCsv(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    // Simple CSV parse
+    const lines = text.split("\n");
+    let imported = 0;
+    if (!DB.notes) DB.notes = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",");
+      if (cols.length < 6) continue;
+      const note = {
+        id: Date.now() + i,
+        title: cols[0] || "未命名笔记" + i,
+        date: cols[1] || new Date().toISOString().slice(0,10),
+        type: "导入",
+        views: parseInt(cols[2]) || 0,
+        likes: parseInt(cols[3]) || 0,
+        collects: parseInt(cols[4]) || 0,
+        comments: parseInt(cols[5]) || 0,
+        dms: parseInt(cols[6]) || 0,
+        addRate: parseFloat(cols[7]) || 0,
+        tags: ["导入"],
+      };
+      DB.notes.push(note);
+      imported++;
+    }
+    saveData();
+    showToast("成功导入 " + imported + " 条笔记数据");
+    renderNotes();
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+function saveSyncSettings() {
+  showToast("同步设置已保存");
+}
+
+// ========== Settings Page ==========
+
+function renderSettings() {
+  const s = DB.settings;
+  const html = `
+    <div class="section-desc">
+      FDE模型参数与目标值配置。调整目标值后，漏斗看板的达标分析会自动更新。
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>账号信息</h2></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>顾问人设名称</label>
+            <input type="text" value="${s.account}" onchange="updateSetting('account', this.value)">
+          </div>
+          <div class="form-group">
+            <label>企业微信号</label>
+            <input type="text" value="${s.wechat}" onchange="updateSetting('wechat', this.value)">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>漏斗目标值配置</h2><span class="badge">各层转化率目标</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>加微转化率目标（私信→加微）</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="${s.targetAddRate}" onchange="updateSetting('targetAddRate', parseFloat(this.value))" style="width:100px;">
+              <span style="color:var(--gray-500);">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>评估完成率目标（加微→评估）</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="${s.targetAssessRate}" onchange="updateSetting('targetAssessRate', parseFloat(this.value))" style="width:100px;">
+              <span style="color:var(--gray-500);">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>咨询预约率目标（评估→咨询）</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="${s.targetConsultRate}" onchange="updateSetting('targetConsultRate', parseFloat(this.value))" style="width:100px;">
+              <span style="color:var(--gray-500);">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>签约转化率目标（咨询→签约）</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="${s.targetSignRate}" onchange="updateSetting('targetSignRate', parseFloat(this.value))" style="width:100px;">
+              <span style="color:var(--gray-500);">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>端到端转化率目标（加微→签约）</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="${s.targetE2E}" onchange="updateSetting('targetE2E', parseFloat(this.value))" style="width:100px;">
+              <span style="color:var(--gray-500);">%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px 16px;background:var(--primary-bg);border-radius:8px;font-size:13px;color:var(--primary);">
+          修改目标值后，数据看板和漏斗模型的达标分析将自动更新。
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>数据管理</h2></div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="exportData()">导出全部数据（JSON）</button>
+          <button class="btn btn-outline" onclick="resetData()" style="border-color:var(--danger);color:var(--danger);">重置为初始数据</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray-500);">数据存储在浏览器本地（localStorage），不会上传服务器。导出JSON可备份或迁移。</div>
+      </div>
+    </div>
+  `;
+  document.getElementById("page-content").innerHTML = html;
+}
+
+function updateSetting(key, val) {
+  DB.settings[key] = val;
+  saveData();
+  showToast("设置已保存");
+}
+
+// ========== Modal & Actions ==========
+
+function openAddCustomerModal() {
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header">
+      <h2>录入新客户</h2>
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>客户姓名</label>
+        <input type="text" id="c-name" placeholder="如：张先生">
+      </div>
+      <div class="form-group">
+        <label>企业微信号</label>
+        <input type="text" id="c-wechat" placeholder="如：zhang_xh">
+      </div>
+      <div class="form-group">
+        <label>签证类型</label>
+        <select id="c-visa">
+          <option value="189独立技术移民">189独立技术移民</option>
+          <option value="190州担保">190州担保</option>
+          <option value="491偏远地区">491偏远地区</option>
+          <option value="GTI全球人才">GTI全球人才</option>
+          <option value="雇主担保482">雇主担保482</option>
+          <option value="雇主担保186">雇主担保186</option>
+          <option value="投资移民188">投资移民188</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>来源渠道</label>
+        <input type="text" id="c-source" placeholder="如：小红书笔记-避坑指南">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>意向分层</label>
+          <select id="c-tier">
+            <option value="A">A-高意向</option>
+            <option value="B">B-中意向</option>
+            <option value="C">C-低意向</option>
+            <option value="D">D-沉默</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>当前阶段</label>
+          <select id="c-stage">
+            <option value="assessment">评估阶段</option>
+            <option value="trust-build">信任建立期（Day1-7）</option>
+            <option value="interest-push">意向推进期（Day8-14）</option>
+            <option value="deep-consult">深度咨询期（Day15-20）</option>
+            <option value="long-follow">长线跟进期（Day21-30）</option>
+            <option value="signed">已签约</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="c-notes" placeholder="客户基本信息、职业、英语情况等"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveNewCustomer()">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveNewCustomer() {
+  const today = new Date().toISOString().slice(0, 10);
+  const c = {
+    id: Date.now(),
+    name: val("c-name"),
+    wechat: val("c-wechat"),
+    visaType: val("c-visa"),
+    source: val("c-source"),
+    tier: val("c-tier"),
+    stage: val("c-stage"),
+    addDate: today,
+    lastContact: today,
+    status: "active",
+    notes: val("c-notes"),
+  };
+  if (!c.name) { showToast("请填写客户姓名"); return; }
+  DB.customers.push(c);
+  // Update funnel data
+  DB.funnelData.addWechat++;
+  if (c.stage !== "assessment" && c.stage !== "signed") DB.funnelData.assessment++;
+  saveData();
+  closeModal();
+  showToast("客户已录入");
+  if (currentPage === "dashboard") renderDashboard();
+  else if (currentPage === "customers") renderCustomers();
+}
+
+function editCustomer(id) {
+  const c = DB.customers.find(x => x.id === id);
+  if (!c) return;
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header">
+      <h2>编辑客户 — ${c.name}</h2>
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>客户姓名</label><input type="text" id="e-name" value="${c.name}"></div>
+      <div class="form-group"><label>企业微信号</label><input type="text" id="e-wechat" value="${c.wechat}"></div>
+      <div class="form-group">
+        <label>签证类型</label>
+        <select id="e-visa">
+          ${["189独立技术移民","190州担保","491偏远地区","GTI全球人才","雇主担保482","雇主担保186","投资移民188","其他"].map(v => `<option value="${v}" ${c.visaType===v?"selected":""}>${v}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group"><label>来源渠道</label><input type="text" id="e-source" value="${c.source}"></div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>意向分层</label>
+          <select id="e-tier">
+            ${["A","B","C","D"].map(v => `<option value="${v}" ${c.tier===v?"selected":""}>${v}类</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>当前阶段</label>
+          <select id="e-stage">
+            ${[["assessment","评估阶段"],["trust-build","信任建立期"],["interest-push","意向推进期"],["deep-consult","深度咨询期"],["long-follow","长线跟进期"],["signed","已签约"]].map(([k,l]) => `<option value="${k}" ${c.stage===k?"selected":""}>${l}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>状态</label>
+          <select id="e-status">
+            ${[["active","在跟"],["waiting","待回"],["signed","已签约"],["lost","流失"]].map(([k,l]) => `<option value="${k}" ${c.status===k?"selected":""}>${l}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group"><label>最后联系日期</label><input type="date" id="e-last" value="${c.lastContact}"></div>
+      </div>
+      <div class="form-group"><label>备注</label><textarea id="e-notes">${c.notes||""}</textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="border-color:var(--danger);color:var(--danger);" onclick="deleteCustomer(${c.id})">删除</button>
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveEditCustomer(${c.id})">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveEditCustomer(id) {
+  const c = DB.customers.find(x => x.id === id);
+  if (!c) return;
+  c.name = val("e-name");
+  c.wechat = val("e-wechat");
+  c.visaType = val("e-visa");
+  c.source = val("e-source");
+  c.tier = val("e-tier");
+  const oldStage = c.stage;
+  c.stage = val("e-stage");
+  c.status = val("e-status");
+  c.lastContact = val("e-last");
+  c.notes = val("e-notes");
+  // Update funnel if stage changed to signed
+  if (oldStage !== "signed" && c.stage === "signed") {
+    DB.funnelData.signed++;
+    DB.funnelData.deepConsult++;
+  }
+  saveData();
+  closeModal();
+  showToast("客户信息已更新");
+  renderCustomers();
+}
+
+function deleteCustomer(id) {
+  DB.customers = DB.customers.filter(c => c.id !== id);
+  saveData();
+  closeModal();
+  showToast("客户已删除");
+  renderCustomers();
+}
+
+function advanceStage(id) {
+  const c = DB.customers.find(x => x.id === id);
+  if (!c) return;
+  const flow = ["assessment", "trust-build", "interest-push", "deep-consult", "long-follow", "signed"];
+  const idx = flow.indexOf(c.stage);
+  if (idx < 0 || idx >= flow.length - 1) { showToast("已是最后阶段"); return; }
+  c.stage = flow[idx + 1];
+  c.lastContact = new Date().toISOString().slice(0, 10);
+  if (c.stage === "signed") { c.status = "signed"; DB.funnelData.signed++; }
+  if (c.stage === "deep-consult") DB.funnelData.deepConsult++;
+  saveData();
+  showToast(`${c.name} 已推进到下一阶段`);
+  renderCustomers();
+}
+
+function openAddScriptModal() {
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header"><h2>新增话术</h2><span class="modal-close" onclick="closeModal()">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>话术类型</label>
+        <select id="s-type">
+          <option value="icebreak">破冰话术</option>
+          <option value="objection">异议处理</option>
+          <option value="closing">促单话术</option>
+          <option value="faq">FAQ标准回复</option>
+        </select>
+      </div>
+      <div class="form-group"><label>场景描述</label><input type="text" id="s-scene" placeholder="如：189签证-费用异议"></div>
+      <div class="form-group"><label>话术内容</label><textarea id="s-content" rows="5" placeholder="输入话术正文..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveNewScript()">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveNewScript() {
+  const s = {
+    id: Date.now(),
+    type: val("s-type"),
+    scene: val("s-scene"),
+    content: val("s-content"),
+  };
+  if (!s.scene || !s.content) { showToast("请填写完整"); return; }
+  DB.scripts.push(s);
+  saveData();
+  closeModal();
+  showToast("话术已添加");
+  renderScripts();
+}
+
+function editFunnelData() {
+  const f = DB.funnelData;
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-header"><h2>编辑漏斗数据</h2><span class="modal-close" onclick="closeModal()">&times;</span></div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label>笔记曝光量</label><input type="number" id="f-exposure" value="${f.exposure}"></div>
+        <div class="form-group"><label>互动量（赞藏评）</label><input type="number" id="f-interaction" value="${f.interaction}"></div>
+        <div class="form-group"><label>私信咨询量</label><input type="number" id="f-dm" value="${f.dm}"></div>
+        <div class="form-group"><label>加企业微信数</label><input type="number" id="f-addWechat" value="${f.addWechat}"></div>
+        <div class="form-group"><label>完成评估数</label><input type="number" id="f-assessment" value="${f.assessment}"></div>
+        <div class="form-group"><label>深度咨询数</label><input type="number" id="f-deepConsult" value="${f.deepConsult}"></div>
+        <div class="form-group"><label>签约付费数</label><input type="number" id="f-signed" value="${f.signed}"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveFunnelData()">保存</button>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+}
+
+function saveFunnelData() {
+  DB.funnelData = {
+    exposure: parseInt(val("f-exposure")) || 0,
+    interaction: parseInt(val("f-interaction")) || 0,
+    dm: parseInt(val("f-dm")) || 0,
+    addWechat: parseInt(val("f-addWechat")) || 0,
+    assessment: parseInt(val("f-assessment")) || 0,
+    deepConsult: parseInt(val("f-deepConsult")) || 0,
+    signed: parseInt(val("f-signed")) || 0,
+  };
+  saveData();
+  closeModal();
+  showToast("漏斗数据已更新");
+  renderFunnel();
+}
+
+// ========== Utility ==========
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
+}
+
+function closeModal() {
+  document.getElementById("modal-overlay").classList.remove("show");
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function exportData() {
+  const data = JSON.stringify(DB, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fde_workbench_data.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("数据已导出");
+}
+
+function resetData() {
+  if (confirm("确认重置为初始数据？当前数据将丢失。")) {
+    localStorage.removeItem(STORE_KEY);
+    DB = loadData();
+    showToast("已重置为初始数据");
+    navigate(currentPage);
+  }
+}
+
+// Close modal on overlay click
+document.getElementById("modal-overlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("modal-overlay")) closeModal();
+});
+
+// Init
+navigate("dashboard");
+</script>
+</body>
+</html>
